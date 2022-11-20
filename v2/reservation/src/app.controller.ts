@@ -40,6 +40,11 @@ export class AppController {
     };
   }
 
+  @Get('/manage/health')
+  async getHealth() {
+    return '';
+  }
+
   @Get('/')
   async getAllUsersReservations(@Req() request: Request) {
     Logger.log(JSON.stringify(request.headers));

@@ -28,6 +28,11 @@ export class AppController {
     private reservationService: ReservationsService,
   ) {}
 
+  @Get('/manage/health')
+  async getHealth() {
+    return '';
+  }
+
   @Get('/hotels')
   async getHotels(@Query('page') page: number, @Query('size') size: number) {
     return this.reservationService

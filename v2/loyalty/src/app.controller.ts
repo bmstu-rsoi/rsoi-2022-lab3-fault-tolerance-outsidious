@@ -50,4 +50,9 @@ export class AppController {
     const l = await this.service.updateLoyaltyCounter(username, type);
     return this.loyaltyToDTO(l);
   }
+
+  @Get('/manage/health')
+  async getHealth() {
+    return '';
+  }
 }

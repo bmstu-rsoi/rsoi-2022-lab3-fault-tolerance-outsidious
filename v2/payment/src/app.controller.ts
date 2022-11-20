@@ -20,4 +20,9 @@ export class AppController {
   async getPayment(@Param('paymentId') uid: string) {
     return await this.service.getPaymentByUid(uid);
   }
+
+  @Get('/manage/health')
+  async getHealth() {
+    return '';
+  }
 }
