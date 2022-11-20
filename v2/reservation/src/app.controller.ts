@@ -17,12 +17,17 @@ import { AppService } from './app.service';
 import { Request } from 'express';
 import { HotelsService } from './hotels.service';
 
-@Controller('reservations')
+@Controller()
 export class AppController {
   constructor(
     private readonly service: AppService,
     private readonly hotel: HotelsService,
   ) {}
+
+  @Get('manage/health')
+  async getHealth() {
+    return '';
+  }
 
   public reservationToDTO(r: Reservation, h: Hotel) {
     return {
@@ -40,12 +45,7 @@ export class AppController {
     };
   }
 
-  @Get('/manage/health')
-  async getHealth() {
-    return '';
-  }
-
-  @Get('/')
+  @Get('reservations')
   async getAllUsersReservations(@Req() request: Request) {
     Logger.log(JSON.stringify(request.headers));
     const username: string = request.headers['x-user-name']?.toString();
@@ -59,7 +59,7 @@ export class AppController {
     return items;
   }
 
-  @Get('/:reservationUid')
+  @Get('reservations/:reservationUid')
   async getOneReservation(
     @Param('reservationUid') uid: string,
     @Req() request: Request,
@@ -75,7 +75,7 @@ export class AppController {
     }
   }
 
-  @Post('/')
+  @Post('reservations')
   async createReservation(@Body() body: Reservation, @Req() request: Request) {
     const username: string = request.headers['x-user-name']?.toString();
     if (!username) throw new BadRequestException('x-user-name');
@@ -95,7 +95,7 @@ export class AppController {
     };
   }
 
-  @Patch('/:reservationUid')
+  @Patch('reservations/:reservationUid')
   async updateReservation(
     @Param('reservationUid') uid: string,
     @Req() request: Request,
@@ -113,7 +113,7 @@ export class AppController {
     }
   }
 
-  @Delete('/:reservationUid')
+  @Delete('reservations/:reservationUid')
   async deleteReservation(
     @Param('reservationUid') uid: string,
     @Req() request: Request,

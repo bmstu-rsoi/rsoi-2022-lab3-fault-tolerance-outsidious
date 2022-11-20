@@ -20,7 +20,7 @@ import { Reservation } from './models/reservation';
 import { Request } from 'express';
 import { map } from 'rxjs';
 
-@Controller('api/v1')
+@Controller()
 export class AppController {
   constructor(
     private loaltyService: LoyaltyService,
@@ -28,12 +28,12 @@ export class AppController {
     private reservationService: ReservationsService,
   ) {}
 
-  @Get('/manage/health')
+  @Get('manage/health')
   async getHealth() {
     return '';
   }
 
-  @Get('/hotels')
+  @Get('api/v1/hotels')
   async getHotels(@Query('page') page: number, @Query('size') size: number) {
     return this.reservationService
       .getHotels(page, size)
@@ -68,14 +68,14 @@ export class AppController {
     return items;
   }
 
-  @Get('/reservations')
+  @Get('api/v1/reservations')
   async getReservations(@Req() request: Request) {
     const username: string = request.headers['x-user-name']?.toString();
     if (!username) throw new BadRequestException('x-user-name');
     return this.getAllReservations(username);
   }
 
-  @Post('/reservations/')
+  @Post('api/v1/reservations')
   @HttpCode(200)
   async createReservation(
     @Req() request: Request,
@@ -140,7 +140,7 @@ export class AppController {
     };
   }
 
-  @Get('/reservations/:reservationId')
+  @Get('api/v1/reservations/:reservationId')
   async getReservationById(
     @Param('reservationId') uid: string,
     @Req() request: Request,
@@ -167,7 +167,7 @@ export class AppController {
     };
   }
 
-  @Delete('/reservations/:reservationId')
+  @Delete('api/v1/reservations/:reservationId')
   @HttpCode(204)
   async deleteReservation(
     @Param('reservationId') uid: string,
@@ -189,7 +189,7 @@ export class AppController {
       .toPromise();
   }
 
-  @Get('loyalty')
+  @Get('api/v1/loyalty')
   async getLoyalty(@Req() request: Request) {
     const username: string = request.headers['x-user-name']?.toString();
     if (!username) throw new BadRequestException('x-user-name');
@@ -201,7 +201,7 @@ export class AppController {
     };
   }
 
-  @Get('/me')
+  @Get('api/v1/me')
   async getMe(@Req() request: Request) {
     const username: string = request.headers['x-user-name']?.toString();
     if (!username) throw new BadRequestException('x-user-name');

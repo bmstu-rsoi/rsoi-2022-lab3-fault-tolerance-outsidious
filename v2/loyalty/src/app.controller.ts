@@ -11,9 +11,14 @@ import { AppService } from './app.service';
 import { Request } from 'express';
 import { Loyalty } from './loyalty';
 
-@Controller('loyalty')
+@Controller()
 export class AppController {
   constructor(private readonly service: AppService) {}
+
+  @Get('manage/health')
+  async getHealth() {
+    return '';
+  }
 
   public loyaltyToDTO(l: Loyalty) {
     return {
@@ -24,7 +29,7 @@ export class AppController {
     };
   }
 
-  @Get('/')
+  @Get('loyalty')
   async getUserLoyalty(@Req() request: Request) {
     const username: string = request.headers['x-user-name']?.toString();
     if (!username) throw new BadRequestException('Username!');
@@ -32,7 +37,7 @@ export class AppController {
     return this.loyaltyToDTO(l);
   }
 
-  @Post('/')
+  @Post('loyalty')
   async createUserLoyalty(@Req() request: Request) {
     const username: string = request.headers['x-user-name']?.toString();
     if (!username) throw new BadRequestException('Username!');
@@ -40,7 +45,7 @@ export class AppController {
     return this.loyaltyToDTO(l);
   }
 
-  @Patch('/')
+  @Patch('loyalty')
   async updateUserLoyalty(
     @Body('type') type: 'inc' | 'dec',
     @Req() request: Request,
@@ -49,10 +54,5 @@ export class AppController {
     if (!username) throw new BadRequestException('Username!');
     const l = await this.service.updateLoyaltyCounter(username, type);
     return this.loyaltyToDTO(l);
-  }
-
-  @Get('/manage/health')
-  async getHealth() {
-    return '';
   }
 }
