@@ -9,6 +9,7 @@ import {
   Post,
   Query,
   Req,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { LoyaltyService } from './services/loyalty/loyalty.service';
 import { PaymentService } from './services/payment/payment.service';
@@ -86,6 +87,9 @@ export class AppController {
     const username: string = request.headers['x-user-name']?.toString();
     if (!username) throw new BadRequestException('x-user-name');
     const hotel = await this.reservationService.getHotel(hotelUid).toPromise();
+    if (!hotel) {
+      throw new ServiceUnavailableException('Reservation Service unavailable');
+    }
     const date1 = moment(startDate);
     const date2 = moment(endDate);
     const days = date2.diff(date1, 'days');
@@ -93,6 +97,9 @@ export class AppController {
     let loyalty = await this.loaltyService.getLoyalty(username).toPromise();
     if (!loyalty) {
       loyalty = await this.loaltyService.createLoyalty(username).toPromise();
+    }
+    if (!loyalty) {
+      throw new ServiceUnavailableException('Loyalty Service unavailable');
     }
     let sale = 0;
     if (loyalty.status === 'BRONZE') {
@@ -112,6 +119,9 @@ export class AppController {
     const p = await this.paymentService
       .createPayment(username, payment)
       .toPromise();
+    if (!p) {
+      throw new ServiceUnavailableException('Payment Service unavailable');
+    }
     const l2 = await this.loaltyService
       .updateLoyaltyCount(username, 'inc')
       .toPromise();
@@ -179,11 +189,15 @@ export class AppController {
     const r = await this.reservationService
       .setReservationStatus(username, uid, 'CANCELED')
       .toPromise();
-
+    if (!r) {
+      throw new ServiceUnavailableException('Reservation Service unavailable');
+    }
     const p = await this.paymentService
       .changePaymentState(username, r.paymentUid, 'CANCELED')
       .toPromise();
-
+    if (!p) {
+      throw new ServiceUnavailableException('Payment Service unavailable');
+    }
     const l = await this.loaltyService
       .updateLoyaltyCount(username, 'dec')
       .toPromise();
@@ -195,6 +209,9 @@ export class AppController {
     if (!username) throw new BadRequestException('x-user-name');
 
     const l = await this.loaltyService.getLoyalty(username).toPromise();
+    if (l === null) {
+      throw new ServiceUnavailableException('Loyalty Service unavailable');
+    }
     return {
       ...l,
       username: undefined,
