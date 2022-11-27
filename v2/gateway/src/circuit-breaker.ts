@@ -14,10 +14,7 @@ export class CircuitBreaker<PAYLOAD> {
   constructor(private request: (...args: any[]) => Promise<PAYLOAD>) {}
 
   async fire(...args: any[]) {
-    if (
-      this.state === 'CLOSED' &&
-      new Date().getMilliseconds() < this.closeMoment!
-    ) {
+    if (this.state === 'CLOSED' && Date.now() < this.closeMoment!) {
       throw new Error('Breaker closed');
     }
     try {
@@ -37,7 +34,7 @@ export class CircuitBreaker<PAYLOAD> {
   private success(response: PAYLOAD) {
     if (this.state === 'HALF') {
       this.successQua++;
-      if (new Date().getMilliseconds() >= this.halfFinishMoment!) {
+      if (Date.now() >= this.halfFinishMoment!) {
         this.state = 'OPENED';
         this.resetStatistic();
       }
@@ -51,39 +48,35 @@ export class CircuitBreaker<PAYLOAD> {
 
   private fail(e: any) {
     if (this.state === 'CLOSED') {
-      this.closeMoment =
-        new Date().getMilliseconds() + this.options.closedTimeout;
+      this.closeMoment = Date.now() + this.options.closedTimeout;
       return e;
     }
     if (this.state === 'OPENED') {
       this.failsQua = 1;
       this.state = 'HALF';
-      this.halfFinishMoment =
-        new Date().getMilliseconds() + this.options.openTimeout;
+      this.halfFinishMoment = Date.now() + this.options.openTimeout;
       return e;
     }
     if (this.state === 'HALF') {
       this.failsQua++;
-      if (new Date().getMilliseconds() > this.halfFinishMoment!) {
+      if (Date.now() > this.halfFinishMoment!) {
         this.resetStatistic();
         this.failsQua = 1;
-        this.halfFinishMoment =
-          new Date().getMilliseconds() + this.options.openTimeout;
+        this.halfFinishMoment = Date.now() + this.options.openTimeout;
         return e;
       }
       if (this.failsQua >= this.options.failedRequests) {
-        const failRate = this.failsQua / (this.failsQua + this.successQua);
+        const failRate =
+          (this.failsQua * 100) / (this.failsQua + this.successQua);
         if (failRate >= this.options.percentFailedRequest) {
           this.state = 'CLOSED';
           this.resetStatistic();
-          this.closeMoment =
-            new Date().getMilliseconds() + this.options.closedTimeout;
+          this.closeMoment = Date.now() + this.options.closedTimeout;
           return e;
         }
         this.resetStatistic();
         this.failsQua = 1;
-        this.halfFinishMoment =
-          new Date().getMilliseconds() + this.options.openTimeout;
+        this.halfFinishMoment = Date.now() + this.options.openTimeout;
         return e;
       }
     }
