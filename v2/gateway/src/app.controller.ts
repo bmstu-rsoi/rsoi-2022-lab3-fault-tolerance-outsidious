@@ -223,15 +223,21 @@ export class AppController {
     const username: string = request.headers['x-user-name']?.toString();
     if (!username) throw new BadRequestException('x-user-name');
     const reservations = await this.getAllReservations(username);
-    let loyality = await this.loaltyService.getLoyalty(username).toPromise();
-    if (!loyality) {
-      loyality = await this.loaltyService.createLoyalty(username).toPromise();
+    let loyalty = await this.loaltyService.getLoyalty(username).toPromise();
+    if (!loyalty) {
+      loyalty = await this.loaltyService.createLoyalty(username).toPromise();
+    }
+    if (!loyalty) {
+      return {
+        reservations,
+        loyalty: {},
+      };
     }
     return {
       reservations,
       loyalty: {
-        status: loyality.status,
-        discount: loyality.discount,
+        status: loyalty.status,
+        discount: loyalty.discount,
       },
     };
   }
