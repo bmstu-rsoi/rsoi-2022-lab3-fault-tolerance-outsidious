@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import { Hotel } from 'src/models/hotel';
 import { Reservation } from 'src/models/reservation';
 
@@ -15,12 +15,18 @@ export class ReservationsService {
     const params = new URLSearchParams();
     params.set('page', page);
     params.set('size', pageSize);
-    return this.http.get(url, { params }).pipe(map((res: any) => res.data));
+    return this.http.get(url, { params }).pipe(
+      map((res: any) => res.data),
+      catchError((e) => of(null)),
+    );
   }
 
   public getHotel(uid: string) {
     const url = this.host + `/hotels/${uid}`;
-    return this.http.get<Hotel>(url).pipe(map((res: any) => res.data));
+    return this.http.get<Hotel>(url).pipe(
+      map((res: any) => res.data),
+      catchError((e) => of(null)),
+    );
   }
 
   public createReservation(username, r: Reservation) {
@@ -31,7 +37,10 @@ export class ReservationsService {
           'X-User-Name': username,
         },
       })
-      .pipe(map((res: any) => res.data));
+      .pipe(
+        map((res: any) => res.data),
+        catchError((e) => of(null)),
+      );
   }
 
   public getReservation(username, uid) {
@@ -42,7 +51,10 @@ export class ReservationsService {
           'X-User-Name': username,
         },
       })
-      .pipe(map((res: any) => res.data));
+      .pipe(
+        map((res: any) => res.data),
+        catchError((e) => of(null)),
+      );
   }
 
   public getUserReservations(username) {
@@ -53,7 +65,10 @@ export class ReservationsService {
           'X-User-Name': username,
         },
       })
-      .pipe(map((res: any) => res.data));
+      .pipe(
+        map((res: any) => res.data),
+        catchError((e) => of(null)),
+      );
   }
 
   public setReservationStatus(username, uid, status) {
@@ -68,6 +83,9 @@ export class ReservationsService {
           },
         },
       )
-      .pipe(map((res: any) => res.data));
+      .pipe(
+        map((res: any) => res.data),
+        catchError((e) => of(null)),
+      );
   }
 }

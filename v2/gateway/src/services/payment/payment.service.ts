@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Payment } from 'src/models/payment';
-import { map } from 'rxjs';
+import { catchError, map, of } from 'rxjs';
 
 @Injectable()
 export class PaymentService {
@@ -17,7 +17,10 @@ export class PaymentService {
           'X-User-Name': username,
         },
       })
-      .pipe(map((res: any) => res.data));
+      .pipe(
+        map((res: any) => res.data),
+        catchError((e) => of(null)),
+      );
   }
 
   public createPayment(username: string, payment: Payment) {
@@ -28,7 +31,10 @@ export class PaymentService {
           'X-User-Name': username,
         },
       })
-      .pipe(map((res: any) => res.data));
+      .pipe(
+        map((res: any) => res.data),
+        catchError((e) => of(null)),
+      );
   }
 
   public changePaymentState(username, uid, status) {
@@ -43,6 +49,9 @@ export class PaymentService {
           },
         },
       )
-      .pipe(map((res: any) => res.data));
+      .pipe(
+        map((res: any) => res.data),
+        catchError((e) => of(null)),
+      );
   }
 }
