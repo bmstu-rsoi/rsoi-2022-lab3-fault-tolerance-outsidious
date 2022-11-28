@@ -22,8 +22,7 @@ export class MessageConsumer {
       };
     }>,
   ) {
-    if (job.data.creationTime + 10 * 1000 < new Date().getMilliseconds())
-      return;
+    if (job.data.creationTime + 10 * 1000 < Date.now()) return;
     const res = await this.loyalty
       .updateLoyaltyCount(
         job.data.requestData.username,
