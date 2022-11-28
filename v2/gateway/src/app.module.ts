@@ -14,7 +14,7 @@ import { MessageConsumer } from './services/queue/queue.service';
     BullModule.forRoot({
       redis: {
         host: 'localhost',
-        port: 8000,
+        port: 8080,
         tls: {
           rejectUnauthorized: false,
         },
