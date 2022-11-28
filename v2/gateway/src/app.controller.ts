@@ -20,6 +20,8 @@ import { Payment } from './models/payment';
 import { Reservation } from './models/reservation';
 import { Request } from 'express';
 import { map } from 'rxjs';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
 
 @Controller()
 export class AppController {
@@ -27,6 +29,7 @@ export class AppController {
     private loaltyService: LoyaltyService,
     private paymentService: PaymentService,
     private reservationService: ReservationsService,
+    @InjectQueue('queue') private queue: Queue,
   ) {}
 
   @Get('manage/health')
@@ -198,9 +201,18 @@ export class AppController {
     if (!p) {
       throw new ServiceUnavailableException('Payment Service unavailable');
     }
-    const l = await this.loaltyService
+    this.queue.add('job', {
+      try: 1,
+      creationTime: Date.now(),
+      request: 'updateLoyalty',
+      requestData: {
+        username,
+        type: 'dec',
+      },
+    });
+    /*const l = await this.loaltyService
       .updateLoyaltyCount(username, 'dec')
-      .toPromise();
+      .toPromise();*/
   }
 
   @Get('api/v1/loyalty')
