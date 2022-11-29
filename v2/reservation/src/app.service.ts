@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Reservation } from './reservation';
 import { DbService } from './db.service';
 import { Client } from 'pg';
@@ -36,7 +36,6 @@ export class AppService {
   }
 
   async createReservation(r: Reservation) {
-    Logger.log(JSON.stringify(r));
     const query = `
         INSERT INTO ${RESERVVATION_TABLE} (reservation_uid, username, payment_uid, hotel_id, status, start_date, end_data)
           VALUES ('${r.reservation_uid}', '${r.username}', '${r.payment_uid}', ${r.hotel_id}, '${r.status}',timestamp '${r.start_date}',timestamp '${r.end_data}');

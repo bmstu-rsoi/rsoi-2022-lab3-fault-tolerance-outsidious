@@ -22,6 +22,7 @@ export class MessageConsumer {
       };
     }>,
   ) {
+    Logger.log('\n\njob\n\n');
     if (job.data.creationTime + 10 * 1000 < Date.now()) return;
     const res = await this.loyalty
       .updateLoyaltyCount(
@@ -29,7 +30,7 @@ export class MessageConsumer {
         job.data.requestData.type,
       )
       .toPromise();
-    Logger.log(JSON.stringify(res), 'res');
+    Logger.log(res);
     if (!res) {
       this.queue.add('job', {
         try: job.data.try + 1,
