@@ -3,14 +3,17 @@ import { Logger } from '@nestjs/common';
 import { Job, Queue } from 'bull';
 import { LoyaltyService } from '../loyalty/loyalty.service';
 
-@Processor('queue')
+@Processor('my-queue')
 export class MessageConsumer {
   constructor(
     private readonly loyalty: LoyaltyService,
-    @InjectQueue('queue') private queue: Queue,
-  ) {}
+    @InjectQueue('my-queue') private queue: Queue,
+  ) {
+    console.log('constructor');
+    Logger.log('constructor');
+  }
 
-  @Process('job')
+  @Process('my-job')
   async readOperationJob(
     job: Job<{
       try: number;
@@ -23,7 +26,7 @@ export class MessageConsumer {
     }>,
   ) {
     Logger.log('\n\njob\n\n');
-    if (job.data.creationTime + 10 * 1000 < Date.now()) return;
+    if (job.data.creationTime + 5 * 1000 < Date.now()) return;
     const res = await this.loyalty
       .updateLoyaltyCount(
         job.data.requestData.username,
@@ -32,7 +35,7 @@ export class MessageConsumer {
       .toPromise();
     Logger.log(res);
     if (!res) {
-      this.queue.add('job', {
+      this.queue.add('my-job', {
         try: job.data.try + 1,
         creationTime: job.data.creationTime,
         request: job.data.request,

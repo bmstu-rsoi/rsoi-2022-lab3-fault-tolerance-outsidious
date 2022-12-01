@@ -29,7 +29,7 @@ export class AppController {
     private loaltyService: LoyaltyService,
     private paymentService: PaymentService,
     private reservationService: ReservationsService,
-    @InjectQueue('queue') private queue: Queue,
+    @InjectQueue('my-queue') private queue: Queue,
   ) {}
 
   @Get('manage/health')
@@ -201,7 +201,7 @@ export class AppController {
     if (!p) {
       throw new ServiceUnavailableException('Payment Service unavailable');
     }
-    this.queue.add('job', {
+    /*this.queue.add('my-job', {
       try: 1,
       creationTime: Date.now(),
       request: 'updateLoyalty',
@@ -209,10 +209,26 @@ export class AppController {
         username,
         type: 'dec',
       },
-    });
-    /*const l = await this.loaltyService
+    });*/
+    const l = await this.loaltyService
       .updateLoyaltyCount(username, 'dec')
-      .toPromise();*/
+      .toPromise();
+    if (!l) {
+      this.intervalUpdateLoyaltyCount(username, 'dec');
+    }
+  }
+
+  intervalUpdateLoyaltyCount(username, type) {
+    let qua = 1;
+    const interval = setInterval(async () => {
+      qua += 1;
+      const l = await this.loaltyService
+        .updateLoyaltyCount(username, type)
+        .toPromise();
+      if (l || qua >= 10) {
+        clearInterval(interval);
+      }
+    }, 5000);
   }
 
   @Get('api/v1/loyalty')

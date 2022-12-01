@@ -13,7 +13,7 @@ import { MessageConsumer } from './services/queue/queue.service';
     HttpModule,
     BullModule.forRoot({
       redis: {
-        host: 'localhost',
+        host: 'gateway',
         port: 8080,
         tls: {
           rejectUnauthorized: false,
@@ -21,7 +21,7 @@ import { MessageConsumer } from './services/queue/queue.service';
       },
     }),
     BullModule.registerQueue({
-      name: 'queue',
+      name: 'my-queue',
     }),
   ],
   controllers: [AppController],
